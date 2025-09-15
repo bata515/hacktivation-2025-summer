@@ -3,9 +3,11 @@
 ## 1. システム概要
 
 ### 1.1 目的
-ブロックチェーン技術を活用して永続的に保存されるデジタル人格と、OpenAI APIを組み合わせた対話システムの実現。
+
+ブロックチェーン技術を活用して永続的に保存されるデジタル人格と、OpenAI API を組み合わせた対話システムの実現。
 
 ### 1.2 システム特性
+
 - **永続性**: ブロックチェーンによるデータの永続的保存
 - **改ざん耐性**: 分散型台帳による改ざん不可能性
 - **分散化**: 中央管理者不在のシステム
@@ -39,6 +41,7 @@
 ### 2.2 技術スタック詳細
 
 #### フロントエンド
+
 - **Framework**: Next.js 15.3.3 (App Router)
 - **UI Library**: React 19.1.0
 - **Styling**: CSS Modules / Tailwind CSS
@@ -50,6 +53,7 @@
 - **Type Safety**: TypeScript 5.5.4
 
 #### ブロックチェーン
+
 - **Network**: Anvil (Local Ethereum fork)
 - **Smart Contract**: Solidity 0.8.x
 - **Development Framework**: Foundry
@@ -61,55 +65,162 @@
 
 ```solidity
 // PersonaRegistry.sol
+pragma solidity ^0.8.20;
+
 contract PersonaRegistry {
+    // 人格の基本情報
+    struct BasicInfo {
+        uint8 age;
+        string occupation;
+        string background;
+    }
+
+    // 人格の性格特性
+    struct Personality {
+        string traits;        // カンマ区切りの特徴
+        string speakingStyle;
+        string tone;
+    }
+
+    // 人格の知識・経験
+    struct Knowledge {
+        string expertise;     // カンマ区切りの専門分野
+        string experiences;   // カンマ区切りの経験
+        string memories;      // カンマ区切りの記憶
+    }
+
+    // 人格の価値観
+    struct Values {
+        string beliefs;       // カンマ区切りの信念
+        string priorities;    // カンマ区切りの優先事項
+    }
+
+    // 完全な人格データ（オンチェーン保存）
     struct Persona {
-        string metadataURI;  // JSON データのURI (IPFS or オンチェーン)
+        uint256 id;
+        string name;
+        BasicInfo basicInfo;
+        Personality personality;
+        Knowledge knowledge;
+        Values values;
         address owner;
         uint256 createdAt;
         uint256 updatedAt;
         bool isActive;
     }
 
+    // Storage
+    uint256 private nextPersonaId = 1;
     mapping(uint256 => Persona) public personas;
     mapping(address => uint256[]) public userPersonas;
 
-    event PersonaCreated(uint256 indexed personaId, address indexed owner);
-    event PersonaUpdated(uint256 indexed personaId);
+    // Events
+    event PersonaCreated(uint256 indexed personaId, address indexed owner, string name);
+    event PersonaUpdated(uint256 indexed personaId, string name);
     event PersonaTransferred(uint256 indexed personaId, address from, address to);
+    event PersonaDeactivated(uint256 indexed personaId);
 }
 ```
 
 ### 3.2 主要関数
 
-| 関数名 | 説明 | アクセス制御 |
-|--------|------|-------------|
-| `createPersona` | 新規人格作成 | 任意のユーザー |
-| `updatePersona` | 人格データ更新 | 所有者のみ |
-| `getPersona` | 人格データ取得 | パブリック |
-| `listUserPersonas` | ユーザーの人格一覧取得 | パブリック |
-| `transferPersona` | 人格の所有権移転 | 所有者のみ |
-| `deactivatePersona` | 人格の無効化 | 所有者のみ |
+| 関数名                    | 説明                                       | アクセス制御   |
+| ------------------------- | ------------------------------------------ | -------------- |
+| `createPersona`           | 新規人格作成（全データをオンチェーン保存） | 任意のユーザー |
+| `updatePersona`           | 人格データ更新（部分更新可能）             | 所有者のみ     |
+| `getPersona`              | 人格データ取得（構造体全体を返却）         | パブリック     |
+| `getPersonaDetails`       | 人格の詳細データを個別に取得               | パブリック     |
+| `listUserPersonas`        | ユーザーの人格 ID 一覧取得                 | パブリック     |
+| `getUserPersonasWithData` | ユーザーの全人格データ取得                 | パブリック     |
+| `transferPersona`         | 人格の所有権移転                           | 所有者のみ     |
+| `deactivatePersona`       | 人格の無効化（削除ではなくフラグ管理）     | 所有者のみ     |
 
-### 3.3 データ保存戦略
+### 3.3 オンチェーン保存の実装詳細
 
-#### オンチェーン保存（デモ版）
+#### 関数実装例
+
 ```solidity
-struct PersonaData {
-    string name;
-    string basicInfo;     // JSON文字列
-    string personality;   // JSON文字列
-    string knowledge;     // JSON文字列
-    string values;        // JSON文字列
+function createPersona(
+    string memory _name,
+    uint8 _age,
+    string memory _occupation,
+    string memory _background,
+    string memory _traits,
+    string memory _speakingStyle,
+    string memory _tone,
+    string memory _expertise,
+    string memory _experiences,
+    string memory _memories,
+    string memory _beliefs,
+    string memory _priorities
+) public returns (uint256) {
+    uint256 personaId = nextPersonaId++;
+
+    Persona storage newPersona = personas[personaId];
+    newPersona.id = personaId;
+    newPersona.name = _name;
+
+    // 基本情報
+    newPersona.basicInfo.age = _age;
+    newPersona.basicInfo.occupation = _occupation;
+    newPersona.basicInfo.background = _background;
+
+    // 性格
+    newPersona.personality.traits = _traits;
+    newPersona.personality.speakingStyle = _speakingStyle;
+    newPersona.personality.tone = _tone;
+
+    // 知識
+    newPersona.knowledge.expertise = _expertise;
+    newPersona.knowledge.experiences = _experiences;
+    newPersona.knowledge.memories = _memories;
+
+    // 価値観
+    newPersona.values.beliefs = _beliefs;
+    newPersona.values.priorities = _priorities;
+
+    // メタデータ
+    newPersona.owner = msg.sender;
+    newPersona.createdAt = block.timestamp;
+    newPersona.updatedAt = block.timestamp;
+    newPersona.isActive = true;
+
+    userPersonas[msg.sender].push(personaId);
+
+    emit PersonaCreated(personaId, msg.sender, _name);
+
+    return personaId;
 }
 ```
 
-**メリット**:
-- 完全な分散化
-- 外部依存なし
+#### ガス最適化戦略
 
-**デメリット**:
-- 高いガス代
-- データサイズ制限
+1. **ストレージパッキング**:
+
+   - `uint8`を使用して年齢を保存（uint256 の代わりに）
+   - `bool`と`address`を同じスロットに配置
+
+2. **文字列の効率化**:
+
+   - 配列の代わりにカンマ区切り文字列を使用
+   - フロントエンドで分割・結合処理
+
+3. **読み取り最適化**:
+   - 個別フィールド取得関数の提供
+   - 必要なデータのみを取得可能
+
+**オンチェーン保存のメリット**:
+
+- **完全な分散化**: 外部サービスへの依存なし
+- **永続性保証**: ブロックチェーンが存在する限りデータが保持
+- **透明性**: すべてのデータが公開検証可能
+- **シンプルな実装**: IPFS 等の追加インフラ不要
+
+**考慮事項**:
+
+- **ガス代**: デモ環境（Anvil）では無料、本番環境では要検討
+- **プライバシー**: すべてのデータが公開される
+- **ストレージ制限**: 極端に長いテキストは分割保存が必要
 
 ## 4. フロントエンド設計
 
@@ -164,15 +275,16 @@ interface AppState {
 }
 
 // Custom Hooks
-usePersona()      // 人格データの取得・更新
-useChat()         // チャット機能
-useContract()     // スマートコントラクト操作
-useOpenAI()       // OpenAI API連携
+usePersona(); // 人格データの取得・更新
+useChat(); // チャット機能
+useContract(); // スマートコントラクト操作
+useOpenAI(); // OpenAI API連携
 ```
 
 ### 4.3 コンポーネント設計詳細
 
 #### PersonaForm コンポーネント
+
 ```typescript
 interface PersonaFormProps {
   mode: 'create' | 'edit';
@@ -188,6 +300,7 @@ interface PersonaFormProps {
 ```
 
 #### ChatInterface コンポーネント
+
 ```typescript
 interface ChatInterfaceProps {
   persona: Persona;
@@ -195,10 +308,10 @@ interface ChatInterfaceProps {
 }
 
 // 機能
-- リアルタイムメッセージ表示
-- タイピングインジケーター
-- メッセージ履歴のスクロール
-- エラーハンドリング
+-リアルタイムメッセージ表示 -
+  タイピングインジケーター -
+  メッセージ履歴のスクロール -
+  エラーハンドリング;
 ```
 
 ## 5. データフロー詳細
@@ -244,7 +357,7 @@ sequenceDiagram
     F-->>U: レスポンス表示
 ```
 
-## 6. API設計
+## 6. API 設計
 
 ### 6.1 OpenAI API 統合
 
@@ -254,15 +367,15 @@ interface ChatRequest {
   messages: [
     {
       role: "system";
-      content: string;  // 人格コンテキスト
+      content: string; // 人格コンテキスト
     },
     {
       role: "user";
-      content: string;  // ユーザーメッセージ
+      content: string; // ユーザーメッセージ
     }
   ];
-  temperature: number;  // 0.7 推奨
-  max_tokens: number;   // 応答の最大長
+  temperature: number; // 0.7 推奨
+  max_tokens: number; // 応答の最大長
 }
 ```
 
@@ -279,20 +392,20 @@ function buildSystemPrompt(persona: PersonaData): string {
 - 背景: ${persona.basic_info.background}
 
 【性格特徴】
-${persona.personality.traits.join(', ')}
+${persona.personality.traits.join(", ")}
 
 【話し方】
 - スタイル: ${persona.personality.speaking_style}
 - 口調: ${persona.personality.tone}
 
 【知識・経験】
-- 専門分野: ${persona.knowledge.expertise.join(', ')}
-- 重要な経験: ${persona.knowledge.experiences.join(', ')}
-- 記憶: ${persona.knowledge.memories.join(', ')}
+- 専門分野: ${persona.knowledge.expertise.join(", ")}
+- 重要な経験: ${persona.knowledge.experiences.join(", ")}
+- 記憶: ${persona.knowledge.memories.join(", ")}
 
 【価値観】
-- 信念: ${persona.values.beliefs.join(', ')}
-- 優先事項: ${persona.values.priorities.join(', ')}
+- 信念: ${persona.values.beliefs.join(", ")}
+- 優先事項: ${persona.values.priorities.join(", ")}
 
 上記の人格設定に基づいて、一貫性のある応答をしてください。
 `;
@@ -303,13 +416,14 @@ ${persona.personality.traits.join(', ')}
 
 ### 7.1 フロントエンドセキュリティ
 
-- **APIキー管理**:
+- **API キー管理**:
+
   - 環境変数での管理（NEXT_PUBLIC_OPENAI_API_KEY）
   - プロダクション環境ではプロキシサーバー経由を推奨
 
 - **入力検証**:
-  - XSS対策: 全ユーザー入力のサニタイズ
-  - SQLインジェクション: N/A（DBなし）
+
+  - XSS 対策: 全ユーザー入力のサニタイズ
   - 文字数制限の実装
 
 - **CSP (Content Security Policy)**:
@@ -317,21 +431,19 @@ ${persona.personality.traits.join(', ')}
   // next.config.js
   const securityHeaders = [
     {
-      key: 'Content-Security-Policy',
-      value: "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://api.openai.com"
-    }
+      key: "Content-Security-Policy",
+      value:
+        "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://api.openai.com",
+    },
   ];
   ```
 
 ### 7.2 スマートコントラクトセキュリティ
 
 - **アクセス制御**:
-  - onlyOwner修飾子の実装
-  - 人格データの所有者確認
 
-- **リエントランシー対策**:
-  - ReentrancyGuardの使用
-  - Checks-Effects-Interactionsパターン
+  - onlyOwner 修飾子の実装
+  - 人格データの所有者確認
 
 - **データ検証**:
   - 入力データサイズの制限
@@ -356,15 +468,17 @@ NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
 
 ### 8.2 ローカル開発フロー
 
-1. **Anvilの起動**
+1. **Anvil の起動**
+
    ```bash
    cd packages/contract
    anvil
    ```
 
 2. **コントラクトのデプロイ**
+
    ```bash
-   forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast
+   forge script script/PersonaRegistry.s.sol --rpc-url http://localhost:8545 --broadcast
    ```
 
 3. **フロントエンドの起動**
@@ -398,48 +512,21 @@ contract PersonaRegistryTest is Test {
 
 ```typescript
 // コンポーネントテスト
-describe('PersonaForm', () => {
-  it('should validate required fields', () => {});
-  it('should submit valid data', () => {});
+describe("PersonaForm", () => {
+  it("should validate required fields", () => {});
+  it("should submit valid data", () => {});
 });
 
 // 統合テスト
-describe('Chat Flow', () => {
-  it('should load persona and enable chat', () => {});
-  it('should send message and receive response', () => {});
+describe("Chat Flow", () => {
+  it("should load persona and enable chat", () => {});
+  it("should send message and receive response", () => {});
 });
 ```
 
-## 10. パフォーマンス最適化
+## 10. デプロイメント設計
 
-### 10.1 フロントエンド最適化
-
-- **コード分割**:
-  - 動的インポートの活用
-  - ルートベースの分割
-
-- **キャッシング**:
-  - SWRまたはReact Queryの使用
-  - ブロックチェーンデータのキャッシュ
-
-- **画像最適化**:
-  - Next.js Image コンポーネントの使用
-  - WebP形式の採用
-
-### 10.2 ブロックチェーン最適化
-
-- **ガス最適化**:
-  - ストレージの最小化
-  - バッチ処理の実装
-  - イベントログの活用
-
-- **読み取り最適化**:
-  - インデックスの適切な使用
-  - ビュー関数の最適化
-
-## 11. デプロイメント設計
-
-### 11.1 デモ環境（Anvil）
+### 10.1 デモ環境（Anvil）
 
 ```bash
 # ローカル環境での実行
@@ -453,13 +540,14 @@ NEXT_PUBLIC_CHAIN_ID=31337
 ### 11.2 本番環境考慮事項
 
 - **スマートコントラクト**:
-  - Ethereumメインネットへのデプロイ
+
+  - Ethereum メインネットへのデプロイ
   - コントラクトの検証（Etherscan）
   - アップグレード戦略の検討
 
 - **フロントエンド**:
-  - Vercelでのホスティング
-  - CDNの活用
+  - Vercel でのホスティング
+  - CDN の活用
   - 環境変数の管理
 
 ## 12. 監視とロギング
@@ -470,7 +558,7 @@ NEXT_PUBLIC_CHAIN_ID=31337
 // エラートラッキング
 interface ErrorLog {
   timestamp: Date;
-  errorType: 'CONTRACT' | 'API' | 'UI';
+  errorType: "CONTRACT" | "API" | "UI";
   message: string;
   stack?: string;
   userAddress?: string;
@@ -480,7 +568,7 @@ interface ErrorLog {
 ### 12.2 メトリクス収集
 
 - トランザクション成功率
-- API応答時間
+- API 応答時間
 - ユーザーセッション時間
 - 人格作成数
 
@@ -488,30 +576,30 @@ interface ErrorLog {
 
 ### 13.1 機能拡張
 
-- **IPFS統合**: 大容量データの分散保存
-- **NFT化**: 人格のNFTトークン化
+- **IPFS 統合**: 大容量データの分散保存
+- **NFT 化**: 人格の NFT トークン化
 - **マルチチェーン対応**: 複数ブロックチェーンへの展開
 - **音声対話**: 音声入出力機能の追加
 
 ### 13.2 技術的改善
 
-- **Layer 2対応**: ガス代削減のためのL2統合
+- **Layer 2 対応**: ガス代削減のための L2 統合
 - **プライバシー強化**: ゼロ知識証明の活用
-- **AI改善**: ファインチューニングモデルの使用
+- **AI 改善**: ファインチューニングモデルの使用
 
 ## 14. リスクと対策
 
-| リスク | 影響度 | 対策 |
-|--------|--------|------|
-| APIキー漏洩 | 高 | サーバーサイドプロキシの実装 |
-| ガス代高騰 | 中 | L2ソリューションの採用 |
-| OpenAI APIダウン | 中 | フォールバック機能の実装 |
-| データ永続性の誤解 | 低 | 明確な説明とUI表示 |
+| リスク             | 影響度 | 対策                         |
+| ------------------ | ------ | ---------------------------- |
+| API キー漏洩       | 高     | サーバーサイドプロキシの実装 |
+| ガス代高騰         | 中     | L2 ソリューションの採用      |
+| OpenAI API ダウン  | 中     | フォールバック機能の実装     |
+| データ永続性の誤解 | 低     | 明確な説明と UI 表示         |
 
 ## 15. 用語集
 
-- **デジタル人格**: AIが模倣する個人の性格・知識・価値観の集合
+- **デジタル人格**: AI が模倣する個人の性格・知識・価値観の集合
 - **オンチェーン**: ブロックチェーン上に直接保存されるデータ
-- **ガス代**: Ethereumネットワークでの取引手数料
+- **ガス代**: Ethereum ネットワークでの取引手数料
 - **スマートコントラクト**: ブロックチェーン上で実行される自動化されたプログラム
 - **ウォレット**: 暗号資産とブロックチェーンアプリケーションへのアクセスを管理するツール
