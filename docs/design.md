@@ -44,12 +44,12 @@
 
 - **Framework**: Next.js 15.3.3 (App Router)
 - **UI Library**: React 19.1.0
-- **Styling**: CSS Modules / Tailwind CSS
+- **Styling**: Tailwind CSS
 - **Web3**:
   - wagmi 2.15.6 (Ethereum interactions)
   - viem 2.29.2 (TypeScript Ethereum library)
   - @rainbow-me/rainbowkit 2.2.8 (Wallet connection)
-- **State Management**: React Context API + Custom Hooks
+- **State Management**: Zustand + Custom Hooks
 - **Type Safety**: TypeScript 5.5.4
 
 #### ブロックチェーン
@@ -230,7 +230,6 @@ function createPersona(
 src/app/
 ├── page.tsx                 # ホーム（人格一覧）
 ├── layout.tsx               # 共通レイアウト
-├── providers.tsx            # Context Providers
 ├── personas/
 │   ├── create/
 │   │   └── page.tsx        # 人格作成
@@ -257,19 +256,19 @@ src/app/
 ### 4.2 状態管理設計
 
 ```typescript
-// Context構成
+// Zustand Store構成
 interface AppState {
-  // Web3関連
+  // Web3関連 State
   account: string | null;
   chainId: number | null;
   isConnected: boolean;
 
-  // 人格関連
+  // 人格関連 State
   personas: Persona[];
   selectedPersona: Persona | null;
   isLoadingPersonas: boolean;
 
-  // チャット関連
+  // チャット関連 State
   messages: Message[];
   isGenerating: boolean;
 }
