@@ -6,10 +6,8 @@ import "../src/PersonaRegistry.sol";
 
 contract PersonaRegistryScript is Script {
     function run() external {
-        // Get the deployer's private key from environment variable
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-
-        vm.startBroadcast(deployerPrivateKey);
+        // Use the deployer key from broadcast (set via --private-key)
+        vm.startBroadcast();
 
         // Deploy the PersonaRegistry contract
         PersonaRegistry registry = new PersonaRegistry();
@@ -21,12 +19,12 @@ contract PersonaRegistryScript is Script {
 
         // Optionally create a sample persona for testing
         if (block.chainid == 31337) { // Anvil local chain
-            createSamplePersona(registry, deployerPrivateKey);
+            createSamplePersona(registry);
         }
     }
 
-    function createSamplePersona(PersonaRegistry registry, uint256 deployerPrivateKey) internal {
-        vm.startBroadcast(deployerPrivateKey);
+    function createSamplePersona(PersonaRegistry registry) internal {
+        vm.startBroadcast();
 
         console.log("Creating sample persona for testing...");
 
