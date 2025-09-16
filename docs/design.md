@@ -122,18 +122,91 @@ contract PersonaRegistry {
 }
 ```
 
-### 3.2 主要関数
+### 3.2 データ構造定義
 
-| 関数名                    | 説明                                       | アクセス制御   |
-| ------------------------- | ------------------------------------------ | -------------- |
-| `createPersona`           | 新規人格作成（全データをオンチェーン保存） | 任意のユーザー |
-| `updatePersona`           | 人格データ更新（部分更新可能）             | 所有者のみ     |
-| `getPersona`              | 人格データ取得（構造体全体を返却）         | パブリック     |
-| `getPersonaDetails`       | 人格の詳細データを個別に取得               | パブリック     |
-| `listUserPersonas`        | ユーザーの人格 ID 一覧取得                 | パブリック     |
-| `getUserPersonasWithData` | ユーザーの全人格データ取得                 | パブリック     |
-| `transferPersona`         | 人格の所有権移転                           | 所有者のみ     |
-| `deactivatePersona`       | 人格の無効化（削除ではなくフラグ管理）     | 所有者のみ     |
+フロントエンド開発で使用する主要なデータ構造：
+
+#### Persona構造体（完全な人格データ）
+```typescript
+interface Persona {
+  id: bigint;                    // 人格ID
+  name: string;                  // 人格名
+  basicInfo: BasicInfo;          // 基本情報
+  personality: Personality;      // 性格特性
+  knowledge: Knowledge;          // 知識・経験
+  values: Values;                // 価値観
+  owner: string;                 // 所有者アドレス（0x...）
+  createdAt: bigint;             // 作成タイムスタンプ（Unix秒）
+  updatedAt: bigint;             // 更新タイムスタンプ（Unix秒）
+  isActive: boolean;             // アクティブ状態
+}
+```
+
+#### BasicInfo構造体（基本情報）
+```typescript
+interface BasicInfo {
+  age: number;                   // 年齢（1-199）
+  occupation: string;            // 職業
+  background: string;            // 背景・経歴
+}
+```
+
+#### Personality構造体（性格特性）
+```typescript
+interface Personality {
+  traits: string;                // 性格特徴（カンマ区切り）
+  speakingStyle: string;         // 話し方
+  tone: string;                  // 口調
+}
+```
+
+#### Knowledge構造体（知識・経験）
+```typescript
+interface Knowledge {
+  expertise: string;             // 専門分野（カンマ区切り）
+  experiences: string;           // 経験（カンマ区切り）
+  memories: string;              // 記憶（カンマ区切り）
+}
+```
+
+#### Values構造体（価値観）
+```typescript
+interface Values {
+  beliefs: string;               // 信念（カンマ区切り）
+  priorities: string;            // 優先事項（カンマ区切り）
+}
+```
+
+### 3.3 主要関数
+
+#### 人格管理関数
+
+| 関数名             | 説明                                   | パラメータ                                                                                                                                                              | 戻り値           | アクセス制御   |
+| ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | -------------- |
+| `createPersona`    | 新規人格作成（全データをオンチェーン保存） | `_name` (string), `_age` (uint8), `_occupation` (string), `_background` (string), `_traits` (string), `_speakingStyle` (string), `_tone` (string), `_expertise` (string), `_experiences` (string), `_memories` (string), `_beliefs` (string), `_priorities` (string) | `uint256` (人格ID) | 任意のユーザー |
+| `updatePersona`    | 人格データ更新（完全更新）               | `_personaId` (uint256) + createPersonaと同じパラメータ                                                                                                                  | なし             | 所有者のみ     |
+| `transferPersona`  | 人格の所有権移転                       | `_personaId` (uint256), `_to` (address)                                                                                                                                | なし             | 所有者のみ     |
+| `deactivatePersona` | 人格の無効化（フラグによる論理削除）      | `_personaId` (uint256)                                                                                                                                                  | なし             | 所有者のみ     |
+| `reactivatePersona` | 人格の再有効化                         | `_personaId` (uint256)                                                                                                                                                  | なし             | 所有者のみ     |
+
+#### データ取得関数
+
+| 関数名                     | 説明                                 | パラメータ           | 戻り値                        | アクセス制御 |
+| -------------------------- | ------------------------------------ | -------------------- | ----------------------------- | ------------ |
+| `getPersona`              | 人格データ取得（構造体全体を返却）     | `_personaId` (uint256) | `Persona`（上記の完全な人格データ）              | パブリック   |
+| `getPersonaBasicInfo`     | 人格の基本情報のみ取得               | `_personaId` (uint256) | `BasicInfo`（年齢・職業・背景）            | パブリック   |
+| `getPersonaPersonality`   | 人格の性格データのみ取得             | `_personaId` (uint256) | `Personality`（特徴・話し方・口調）          | パブリック   |
+| `getPersonaKnowledge`     | 人格の知識データのみ取得             | `_personaId` (uint256) | `Knowledge`（専門・経験・記憶）            | パブリック   |
+| `getPersonaValues`        | 人格の価値観データのみ取得           | `_personaId` (uint256) | `Values`（信念・優先事項）               | パブリック   |
+| `getUserPersonaIds`       | ユーザーの人格ID一覧取得             | `_user` (address)    | `bigint[]`（人格IDの配列）            | パブリック   |
+| `getUserPersonasWithData` | ユーザーの全人格データ取得（アクティブのみ） | `_user` (address)    | `Persona[]`（人格データの配列）            | パブリック   |
+
+#### 統計関数
+
+| 関数名                        | 説明                              | パラメータ        | 戻り値      | アクセス制御 |
+| ----------------------------- | --------------------------------- | ----------------- | ----------- | ------------ |
+| `getTotalPersonaCount`        | 総人格数取得                      | なし              | `uint256`   | パブリック   |
+| `getUserActivePersonaCount`  | 特定ユーザーのアクティブ人格数取得  | `_user` (address) | `uint256`   | パブリック   |
 
 ### 3.3 オンチェーン保存の実装詳細
 
@@ -154,6 +227,10 @@ function createPersona(
     string memory _beliefs,
     string memory _priorities
 ) public returns (uint256) {
+    // バリデーション
+    require(bytes(_name).length > 0, "Name cannot be empty");
+    require(_age > 0 && _age < 200, "Age must be between 1 and 199");
+
     uint256 personaId = nextPersonaId++;
 
     Persona storage newPersona = personas[personaId];
@@ -192,6 +269,154 @@ function createPersona(
     return personaId;
 }
 ```
+
+#### イベント仕様
+
+| イベント名             | 説明                     | パラメータ                                                   |
+| -------------------- | ----------------------- | ---------------------------------------------------------- |
+| `PersonaCreated`     | 人格作成時に発行          | `personaId` (uint256 indexed), `owner` (address indexed), `name` (string) |
+| `PersonaUpdated`     | 人格更新時に発行          | `personaId` (uint256 indexed), `name` (string)                |
+| `PersonaTransferred` | 人格の所有権移転時に発行    | `personaId` (uint256 indexed), `from` (address), `to` (address) |
+| `PersonaDeactivated` | 人格無効化時に発行        | `personaId` (uint256 indexed)                                 |
+
+#### エラー処理
+
+主要なエラーメッセージ一覧：
+
+- `"Name cannot be empty"` - 人格名が空の場合
+- `"Age must be between 1 and 199"` - 年齢が範囲外の場合
+- `"Not the owner of this persona"` - 所有者でない場合
+- `"Persona is not active"` - 人格が無効化されている場合
+- `"Persona does not exist"` - 存在しない人格IDの場合
+- `"Cannot transfer to zero address"` - ゼロアドレスへの移転の場合
+- `"Cannot transfer to yourself"` - 自分自身への移転の場合
+
+#### フロントエンド実装例
+
+##### 1. 人格作成の実装例
+```typescript
+// wagmiを使用した例
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+
+const { writeContract, data: hash } = useWriteContract()
+const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+const createPersona = async (personaData: PersonaFormData) => {
+  try {
+    await writeContract({
+      address: PERSONA_REGISTRY_ADDRESS,
+      abi: PersonaRegistryABI,
+      functionName: 'createPersona',
+      args: [
+        personaData.name,
+        personaData.age,
+        personaData.occupation,
+        personaData.background,
+        personaData.traits,
+        personaData.speakingStyle,
+        personaData.tone,
+        personaData.expertise,
+        personaData.experiences,
+        personaData.memories,
+        personaData.beliefs,
+        personaData.priorities
+      ],
+    })
+  } catch (error) {
+    // エラーハンドリング
+    if (error.message.includes("Name cannot be empty")) {
+      toast.error("人格名を入力してください")
+    } else if (error.message.includes("Age must be between 1 and 199")) {
+      toast.error("年齢は1〜199の範囲で入力してください")
+    } else {
+      toast.error("人格の作成に失敗しました")
+    }
+  }
+}
+```
+
+##### 2. 人格データ取得の実装例
+```typescript
+import { useReadContract } from 'wagmi'
+
+// 完全な人格データを取得
+const { data: persona, isLoading } = useReadContract({
+  address: PERSONA_REGISTRY_ADDRESS,
+  abi: PersonaRegistryABI,
+  functionName: 'getPersona',
+  args: [personaId],
+})
+
+// ユーザーの全人格を取得
+const { data: userPersonas } = useReadContract({
+  address: PERSONA_REGISTRY_ADDRESS,
+  abi: PersonaRegistryABI,
+  functionName: 'getUserPersonasWithData',
+  args: [userAddress],
+})
+
+// 使用例：人格データの表示
+if (persona) {
+  console.log(`人格名: ${persona.name}`)
+  console.log(`年齢: ${persona.basicInfo.age}`)
+  console.log(`職業: ${persona.basicInfo.occupation}`)
+  console.log(`特徴: ${persona.personality.traits.split(',').join(', ')}`)
+}
+```
+
+##### 3. イベント監視の実装例
+```typescript
+import { useWatchContractEvent } from 'wagmi'
+
+// 人格作成イベントを監視
+useWatchContractEvent({
+  address: PERSONA_REGISTRY_ADDRESS,
+  abi: PersonaRegistryABI,
+  eventName: 'PersonaCreated',
+  onLogs: (logs) => {
+    logs.forEach((log) => {
+      const { personaId, owner, name } = log.args
+      toast.success(`人格「${name}」が作成されました（ID: ${personaId}）`)
+      // UI更新処理
+      refetch() // 人格リストを再取得
+    })
+  },
+})
+```
+
+##### 4. データ変換ユーティリティ
+```typescript
+// カンマ区切り文字列を配列に変換
+export const parseCommaSeparated = (str: string): string[] => {
+  return str ? str.split(',').map(s => s.trim()).filter(Boolean) : []
+}
+
+// 配列をカンマ区切り文字列に変換
+export const joinCommaSeparated = (arr: string[]): string => {
+  return arr.filter(Boolean).join(', ')
+}
+
+// Personaデータの正規化
+export const normalizePersona = (persona: Persona) => ({
+  ...persona,
+  traits: parseCommaSeparated(persona.personality.traits),
+  expertise: parseCommaSeparated(persona.knowledge.expertise),
+  experiences: parseCommaSeparated(persona.knowledge.experiences),
+  memories: parseCommaSeparated(persona.knowledge.memories),
+  beliefs: parseCommaSeparated(persona.values.beliefs),
+  priorities: parseCommaSeparated(persona.values.priorities),
+})
+```
+
+#### フロントエンド連携のポイント
+
+1. **接続確認**: ウォレット接続とネットワーク確認
+2. **ガス見積もり**: トランザクション実行前のガス見積もり
+3. **イベント監視**: PersonaCreated等のイベントを監視してUI更新
+4. **エラーハンドリング**: require文のエラーメッセージをユーザーフレンドリーに表示
+5. **トランザクション状態**: pending → confirmed → success/failure の状態管理
+6. **データ変換**: カンマ区切り文字列と配列の相互変換
+7. **型安全性**: TypeScriptインターフェースでデータ構造を保証
 
 #### ガス最適化戦略
 
