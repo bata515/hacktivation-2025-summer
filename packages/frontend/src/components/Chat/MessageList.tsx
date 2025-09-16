@@ -1,20 +1,29 @@
 "use client";
 
-interface Message {
+import { useEffect, useState } from "react";
+
+type Message = {
   id: string;
   content: string;
   role: "user" | "assistant";
   timestamp: Date;
-}
+};
 
 export default function MessageList() {
+  const [isClient, setIsClient] = useState(false);
+
+  // クライアントサイドでのみ時刻を表示するためのフラグ
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // TODO: 実際のメッセージ履歴を状態管理から取得
   const mockMessages: Message[] = [
     {
       id: "1",
       content: "こんにちは！今日はどんなことについて話したいですか？",
       role: "assistant",
-      timestamp: new Date(),
+      timestamp: new Date("2024-01-01T12:00:00"), // 固定値に変更
     },
   ];
 
@@ -36,7 +45,7 @@ export default function MessageList() {
           >
             <p className="text-sm">{message.content}</p>
             <p className="text-xs mt-1 opacity-70">
-              {message.timestamp.toLocaleTimeString()}
+              {isClient ? message.timestamp.toLocaleTimeString() : ""}
             </p>
           </div>
         </div>

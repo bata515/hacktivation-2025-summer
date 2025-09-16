@@ -55,5 +55,3 @@ alwaysApply: true
 
 - このプロジェクトはNext.jsアプリケーション
 - TypeScriptを使用
-- S3ストレージとの連携機能あり
-- Firebase認証を使用

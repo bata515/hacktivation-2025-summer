@@ -1,11 +1,9 @@
-"use client";
-
-interface PersonaFormProps {
+type Props = {
   mode: "create" | "edit";
   personaId?: string;
 }
 
-export default function PersonaForm({ mode, personaId }: PersonaFormProps) {
+export default function PersonaForm({ mode, personaId }: Props) {
   return (
     <div className="max-w-2xl mx-auto">
       <form className="space-y-6">

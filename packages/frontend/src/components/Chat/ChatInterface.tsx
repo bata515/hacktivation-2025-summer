@@ -3,11 +3,11 @@
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 
-interface ChatInterfaceProps {
-  personaId: string;
+type Props = {
+  personaId: string
 }
 
-export default function ChatInterface({ personaId }: ChatInterfaceProps) {
+export default function ChatInterface({ personaId }: Props) {
   return (
     <div className="max-w-4xl mx-auto h-[600px] flex flex-col bg-white rounded-lg shadow">
       <div className="p-4 border-b">
@@ -23,5 +23,5 @@ export default function ChatInterface({ personaId }: ChatInterfaceProps) {
         <MessageInput />
       </div>
     </div>
-  );
+  )
 }

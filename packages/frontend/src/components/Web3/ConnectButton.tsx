@@ -1,5 +1,3 @@
-"use client";
-
 export default function ConnectButton() {
   // TODO: wagmi/rainbowkitを使用したウォレット接続実装
 

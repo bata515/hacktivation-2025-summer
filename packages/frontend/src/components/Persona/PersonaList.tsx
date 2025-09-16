@@ -1,6 +1,5 @@
-"use client";
-
 import PersonaCard from "./PersonaCard";
+import Link from "next/link";
 
 export default function PersonaList() {
   // TODO: 実際のデータはブロックチェーンから取得
@@ -27,12 +26,12 @@ export default function PersonaList() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">あなたの人格</h2>
-        <button
-          onClick={() => (window.location.href = "/personas/create")}
+        <Link
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          href="/personas/create"
         >
           新しい人格を作成
-        </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -44,12 +43,12 @@ export default function PersonaList() {
       {mockPersonas.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-4">まだ人格が作成されていません</p>
-          <button
-            onClick={() => (window.location.href = "/personas/create")}
+          <Link
+            href="/personas/create"
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             最初の人格を作成
-          </button>
+          </Link>
         </div>
       )}
     </div>

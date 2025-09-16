@@ -1,14 +1,14 @@
 import PersonaForm from "@/components/Persona/PersonaForm";
 
-interface EditPersonaPageProps {
+type Props = {
   params: Promise<{
     id: string;
-  }>;
+  }>
 }
 
 export default async function EditPersonaPage({
   params,
-}: EditPersonaPageProps) {
+}: Props) {
   const { id } = await params;
 
   return (
@@ -16,5 +16,5 @@ export default async function EditPersonaPage({
       <h1 className="text-3xl font-bold mb-8">人格を編集</h1>
       <PersonaForm mode="edit" personaId={id} />
     </main>
-  );
+  )
 }
