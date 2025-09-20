@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import PersonaList from "@/components/Persona/PersonaList";
 import { useTotalPersonaCount } from "@/hooks/usePersonaContract";
@@ -13,32 +13,20 @@ export default function HomePage() {
     <main className="container mx-auto px-4 py-8">
       {/* ヒーローセクション */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900">
-          不老不死デジタル人格システム
-        </h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
-          ブロックチェーン技術を活用して永続的に保存されるデジタル人格との対話システム。
-          あなただけの人格を作成し、永続的な知性との対話を体験してください。
-        </p>
-        
         {/* 統計情報 */}
         <div className="flex justify-center space-x-8 mb-8">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
-              {totalCount || '-'}
+              {totalCount || "-"}
             </div>
             <div className="text-sm text-gray-500">作成された人格</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              ∞
-            </div>
+            <div className="text-2xl font-bold text-green-600">∞</div>
             <div className="text-sm text-gray-500">永続性</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              🔒
-            </div>
+            <div className="text-2xl font-bold text-purple-600">🔒</div>
             <div className="text-sm text-gray-500">改ざん耐性</div>
           </div>
         </div>
