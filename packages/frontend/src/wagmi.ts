@@ -11,11 +11,11 @@ const anvil = {
     symbol: 'ETH',
   },
   rpcUrls: {
-    public: { http: ['http://127.0.0.1:8546'] },
-    default: { http: ['http://127.0.0.1:8546'] },
+    public: { http: [process.env.NEXT_PUBLIC_ANVIL_RPC_URL || 'http://127.0.0.1:8546'] },
+    default: { http: [process.env.NEXT_PUBLIC_ANVIL_RPC_URL || 'http://127.0.0.1:8546'] },
   },
   blockExplorers: {
-    default: { name: 'Local', url: 'http://localhost:8546' },
+    default: { name: 'Local', url: process.env.NEXT_PUBLIC_ANVIL_RPC_URL || 'http://localhost:8546' },
   },
 } as const;
 
