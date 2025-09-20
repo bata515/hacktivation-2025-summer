@@ -6,6 +6,7 @@
  */
 
 import Link from 'next/link';
+import { memo } from 'react';
 import { useAccount } from 'wagmi';
 import PersonaCard from './PersonaCard';
 import { useUserPersonas, useTotalPersonaCount } from '@/hooks/usePersonaContract';
@@ -16,10 +17,10 @@ interface PersonaListProps {
   userAddress?: `0x${string}`;
 }
 
-export default function PersonaList({ 
-  title = 'あなたの人格', 
+function PersonaList({
+  title = 'あなたの人格',
   showCreateButton = true,
-  userAddress 
+  userAddress
 }: PersonaListProps) {
   const { isConnected } = useAccount();
   const { personas, isLoading, error, refetch } = useUserPersonas(userAddress);
@@ -178,3 +179,13 @@ export default function PersonaList({
     </div>
   );
 }
+
+// メモ化でパフォーマンス最適化
+// Props が変わらない限り再レンダリングを防ぐ
+export default memo(PersonaList, (prevProps, nextProps) => {
+  return (
+    prevProps.title === nextProps.title &&
+    prevProps.showCreateButton === nextProps.showCreateButton &&
+    prevProps.userAddress === nextProps.userAddress
+  );
+});
