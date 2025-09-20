@@ -110,7 +110,7 @@ function ChatInterface({ persona }: ChatInterfaceProps) {
         )}
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-scroll">
         <MessageList messages={messages} isGenerating={isGenerating} />
       </div>
 
