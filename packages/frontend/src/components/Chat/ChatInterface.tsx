@@ -5,7 +5,7 @@
  * 人格との対話を管理するメインコンポーネント
  */
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Persona } from '@/types/persona';
 import { buildSystemPrompt } from '@/lib/utils';
 import MessageList from './MessageList';
@@ -22,7 +22,7 @@ interface ChatInterfaceProps {
   persona: Persona;
 }
 
-export default function ChatInterface({ persona }: ChatInterfaceProps) {
+function ChatInterface({ persona }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -51,7 +51,7 @@ export default function ChatInterface({ persona }: ChatInterfaceProps) {
       const systemPrompt = buildSystemPrompt(persona);
       
       // デモ応答（実際はOpenAI APIを呼び出し）
-      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      await new Promise(resolve => setTimeout(resolve, 300)); // レスポンシブ感を保つ最小限の遅延
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -123,3 +123,9 @@ function generateDemoResponse(userMessage: string, persona: Persona): string {
   // デフォルトの応答
   return `${persona.personality.tone || '丁寧に'}お答えします。${userMessage}について、${persona.basicInfo.occupation}の立場から考えてみますね。興味深いお話ですね！`;
 }
+
+// メモ化でパフォーマンス最適化
+// persona.idが変わらない限り再レンダリングを防ぐ
+export default memo(ChatInterface, (prevProps, nextProps) => {
+  return prevProps.persona.id === nextProps.persona.id;
+});

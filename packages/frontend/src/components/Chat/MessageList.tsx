@@ -4,7 +4,7 @@
  * メッセージ一覧表示コンポーネント
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 
 interface Message {
   id: string;
@@ -18,7 +18,7 @@ interface MessageListProps {
   isGenerating?: boolean;
 }
 
-export default function MessageList({ messages, isGenerating = false }: MessageListProps) {
+function MessageList({ messages, isGenerating = false }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -70,3 +70,16 @@ export default function MessageList({ messages, isGenerating = false }: MessageL
     </div>
   );
 }
+
+// メモ化でパフォーマンス最適化
+// messages配列の内容とisGeneratingが変わらない限り再レンダリングを防ぐ
+export default memo(MessageList, (prevProps, nextProps) => {
+  // messagesの長さと最後のメッセージのIDで変更を判定
+  return (
+    prevProps.messages.length === nextProps.messages.length &&
+    prevProps.isGenerating === nextProps.isGenerating &&
+    (prevProps.messages.length === 0 ||
+     prevProps.messages[prevProps.messages.length - 1]?.id ===
+     nextProps.messages[nextProps.messages.length - 1]?.id)
+  );
+});

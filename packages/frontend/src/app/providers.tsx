@@ -21,8 +21,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
           queries: {
             // エラー時の自動リトライを無効化（開発時のデバッグ用）
             retry: false,
-            // staleTimeを設定してキャッシュ効率を向上
-            staleTime: 1000 * 60 * 5, // 5分
+            // ローカル開発用の短いキャッシュ時間
+            staleTime: 1000 * 30, // 30秒
           },
         },
       })

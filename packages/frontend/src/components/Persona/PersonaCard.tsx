@@ -6,6 +6,7 @@
  */
 
 import Link from 'next/link';
+import { memo } from 'react';
 import { Persona } from '@/types/persona';
 import { formatTimestamp, parseCommaSeparated } from '@/lib/utils';
 import { useAccount } from 'wagmi';
@@ -15,7 +16,7 @@ interface PersonaCardProps {
   showActions?: boolean;
 }
 
-export default function PersonaCard({ persona, showActions = true }: PersonaCardProps) {
+function PersonaCard({ persona, showActions = true }: PersonaCardProps) {
   const { address } = useAccount();
   const isOwner = address === persona.owner;
   const traits = parseCommaSeparated(persona.personality.traits);
@@ -133,3 +134,13 @@ export default function PersonaCard({ persona, showActions = true }: PersonaCard
     </div>
   );
 }
+
+// メモ化でパフォーマンス最適化
+// persona.idと showActionsが変わらない限り再レンダリングを防ぐ
+export default memo(PersonaCard, (prevProps, nextProps) => {
+  return (
+    prevProps.persona.id === nextProps.persona.id &&
+    prevProps.persona.updatedAt === nextProps.persona.updatedAt &&
+    prevProps.showActions === nextProps.showActions
+  );
+});
