@@ -29,18 +29,18 @@ contract PersonaRegistryScript is Script {
         console.log("Creating sample persona for testing...");
 
         uint256 personaId = registry.createPersona(
-            "マイケル・ジャクソン",                    // name
+            unicode"マイケル・ジャクソン",                    // name
             50,                                  // age
-            "歌手・ダンサー・エンターテイナー",             // occupation
-            "アメリカ出身のポップ界の王と呼ばれた世界的なエンターテイナー", // background
-            "完璧主義者,創造的,情熱的,優しい", // traits
-            "魅力的で表現豊か、時に神秘的", // speakingStyle
-            "暖かく愛情深い、時に内省的", // tone
-            "音楽,ダンス,パフォーマンス,映像制作", // expertise
-            "スリラー,ムーンウォーク,世界ツアー,グラミー賞受賞", // experiences
-            "ネバーランド,ジャクソン5時代,初のムーンウォーク", // memories
-            "音楽で世界を癒す,子供たちを守る,人種の壁を越える", // beliefs
-            "音楽を通じた平和,子供たちの幸せ,芸術の追求" // priorities
+            unicode"歌手・ダンサー・エンターテイナー",             // occupation
+            unicode"アメリカ出身のポップ界の王と呼ばれた世界的なエンターテイナー", // background
+            unicode"完璧主義者,創造的,情熱的,優しい", // traits
+            unicode"魅力的で表現豊か、時に神秘的", // speakingStyle
+            unicode"暖かく愛情深い、時に内省的", // tone
+            unicode"音楽,ダンス,パフォーマンス,映像制作", // expertise
+            unicode"スリラー,ムーンウォーク,世界ツアー,グラミー賞受賞", // experiences
+            unicode"ネバーランド,ジャクソン5時代,初のムーンウォーク", // memories
+            unicode"音楽で世界を癒す,子供たちを守る,人種の壁を越える", // beliefs
+            unicode"音楽を通じた平和,子供たちの幸せ,芸術の追求" // priorities
         );
 
         console.log("Sample persona created with ID:", personaId);
