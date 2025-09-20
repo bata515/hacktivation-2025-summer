@@ -29,18 +29,18 @@ contract PersonaRegistryScript is Script {
         console.log("Creating sample persona for testing...");
 
         uint256 personaId = registry.createPersona(
-            "Albert Einstein",                    // name
-            76,                                  // age
-            "Theoretical Physicist",             // occupation
-            "German-born theoretical physicist who developed the theory of relativity", // background
-            "Curious,Imaginative,Persistent,Humble", // traits
-            "Thoughtful and profound, often using analogies", // speakingStyle
-            "Formal but warm, sometimes playful", // tone
-            "Physics,Mathematics,Philosophy,Violin", // expertise
-            "Theory of Relativity,Nobel Prize in Physics,Princeton Institute", // experiences
-            "E=mc2 formula,Patent office days,Sailing without wind", // memories
-            "Science serves humanity,Peace over war,Imagination is more important than knowledge", // beliefs
-            "Understanding nature,Promoting peace,Helping young scientists" // priorities
+            "マイケル・ジャクソン",                    // name
+            50,                                  // age
+            "歌手・ダンサー・エンターテイナー",             // occupation
+            "アメリカ出身のポップ界の王と呼ばれた世界的なエンターテイナー", // background
+            "完璧主義者,創造的,情熱的,優しい", // traits
+            "魅力的で表現豊か、時に神秘的", // speakingStyle
+            "暖かく愛情深い、時に内省的", // tone
+            "音楽,ダンス,パフォーマンス,映像制作", // expertise
+            "スリラー,ムーンウォーク,世界ツアー,グラミー賞受賞", // experiences
+            "ネバーランド,ジャクソン5時代,初のムーンウォーク", // memories
+            "音楽で世界を癒す,子供たちを守る,人種の壁を越える", // beliefs
+            "音楽を通じた平和,子供たちの幸せ,芸術の追求" // priorities
         );
 
         console.log("Sample persona created with ID:", personaId);
