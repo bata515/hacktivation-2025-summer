@@ -16,6 +16,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.55.3
         version: 5.87.4(react@19.1.1)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       next:
         specifier: ^15.3.3
         version: 15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -25,6 +28,9 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.1.1(react@19.1.1)
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.0
       viem:
         specifier: 2.29.2
         version: 2.29.2(bufferutil@4.0.9)(typescript@5.5.4)(utf-8-validate@5.0.10)(zod@3.22.4)
@@ -2711,6 +2717,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  tailwind-merge@2.6.0:
+    resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
 
   tailwindcss@3.4.17:
     resolution: {integrity: sha512-w33E2aCvSDP0tW9RZuNXadXlkHXqFzSkQew/aIa2i/Sj8fThxwovwlXHSPXTbAHwEIhBFXAedUhP2tueAKP8Og==}
@@ -6877,6 +6886,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  tailwind-merge@2.6.0: {}
 
   tailwindcss@3.4.17:
     dependencies:
