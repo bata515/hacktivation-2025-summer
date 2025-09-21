@@ -4,6 +4,11 @@ Engineer Cafe Hacktivation 2025 用リポジトリ
 
 ブロックチェーン技術と AI を組み合わせて、永続的なデジタル人格を作成し対話できるシステムです。
 
+## 📊 プレゼンテーション資料
+
+- **ハッカソン発表スライド**: [docs/Hacktivation2025\_不老不死 dApp.pptx](docs/Hacktivation2025_不老不死dApp.pptx)
+  - Engineer Cafe Hacktivation 2025 での発表資料
+
 ## 🚀 クイックスタート
 
 ### 前提条件
