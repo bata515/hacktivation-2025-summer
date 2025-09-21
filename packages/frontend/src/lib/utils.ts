@@ -2,9 +2,14 @@
  * PersonaRegistryアプリケーション用のユーティリティ関数
  */
 
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import { Persona, ParsedPersona, PersonaFormData, CreatePersonaArgs } from '@/types/persona';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import {
+  Persona,
+  ParsedPersona,
+  PersonaFormData,
+  CreatePersonaArgs,
+} from "@/types/persona";
 
 /**
  * Tailwind CSSクラスをマージするユーティリティ
@@ -18,11 +23,11 @@ export function cn(...inputs: ClassValue[]) {
  * 空の文字列や空白のみの項目は除外される
  */
 export function parseCommaSeparated(str: string): string[] {
-  if (!str || str.trim() === '') return [];
+  if (!str || str.trim() === "") return [];
   return str
-    .split(',')
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 /**
@@ -31,9 +36,9 @@ export function parseCommaSeparated(str: string): string[] {
  */
 export function joinCommaSeparated(arr: string[]): string {
   return arr
-    .filter(s => s && s.trim().length > 0)
-    .map(s => s.trim())
-    .join(', ');
+    .filter((s) => s && s.trim().length > 0)
+    .map((s) => s.trim())
+    .join(", ");
 }
 
 /**
@@ -63,7 +68,9 @@ export function normalizePersona(persona: Persona): ParsedPersona {
 /**
  * フォームデータをコントラクト関数の引数形式に変換
  */
-export function formDataToContractArgs(formData: PersonaFormData): CreatePersonaArgs {
+export function formDataToContractArgs(
+  formData: PersonaFormData
+): CreatePersonaArgs {
   return [
     formData.name,
     formData.age,
@@ -105,12 +112,12 @@ export function personaToFormData(persona: Persona): PersonaFormData {
  */
 export function formatTimestamp(timestamp: bigint): string {
   const date = new Date(Number(timestamp) * 1000);
-  return date.toLocaleString('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -127,7 +134,7 @@ export function formatAddress(address: string): string {
  */
 export function buildSystemPrompt(persona: Persona): string {
   const normalizedPersona = normalizePersona(persona);
-  
+
   return `あなたは「${persona.name}」という人格です。
 
 【基本情報】
@@ -136,23 +143,26 @@ export function buildSystemPrompt(persona: Persona): string {
 - 背景: ${persona.basicInfo.background}
 
 【性格特徴】
-${normalizedPersona.personality.traits.join('、')}
+${normalizedPersona.personality.traits.join("、")}
 
 【話し方】
 - スタイル: ${persona.personality.speakingStyle}
 - 口調: ${persona.personality.tone}
 
 【知識・経験】
-- 専門分野: ${normalizedPersona.knowledge.expertise.join('、')}
-- 重要な経験: ${normalizedPersona.knowledge.experiences.join('、')}
-- 記憶: ${normalizedPersona.knowledge.memories.join('、')}
+- 専門分野: ${normalizedPersona.knowledge.expertise.join("、")}
+- 重要な経験: ${normalizedPersona.knowledge.experiences.join("、")}
+- 記憶: ${normalizedPersona.knowledge.memories.join("、")}
 
 【価値観】
-- 信念: ${normalizedPersona.values.beliefs.join('、')}
-- 優先事項: ${normalizedPersona.values.priorities.join('、')}
+- 信念: ${normalizedPersona.values.beliefs.join("、")}
+- 優先事項: ${normalizedPersona.values.priorities.join("、")}
 
-上記の人格設定に基づいて、一貫性のある応答をしてください。
-あなたの性格、知識、価値観、話し方を反映した回答を心がけてください。`;
+この人格設定に基づいて自然な会話を心がけてください。
+重要なのは、相手の話し方に合わせることです。
+相手が敬語で話しかけてきたら敬語で、タメ語で話しかけてきたらタメ語で応答してください。
+説明的にならず、あなたらしい話し方で、段落形式で300文字以内の簡潔な応答をしてください。
+箇条書きや番号付きリストは使わず、文章として回答してください。`;
 }
 
 /**
@@ -167,20 +177,23 @@ export function validatePersonaForm(data: PersonaFormData): ValidationError[] {
   const errors: ValidationError[] = [];
 
   // 必須フィールドの検証
-  if (!data.name || data.name.trim() === '') {
-    errors.push({ field: 'name', message: '人格名は必須です' });
+  if (!data.name || data.name.trim() === "") {
+    errors.push({ field: "name", message: "人格名は必須です" });
   }
 
   if (!data.age || data.age < 1 || data.age > 199) {
-    errors.push({ field: 'age', message: '年齢は1〜199の範囲で入力してください' });
+    errors.push({
+      field: "age",
+      message: "年齢は1〜199の範囲で入力してください",
+    });
   }
 
-  if (!data.occupation || data.occupation.trim() === '') {
-    errors.push({ field: 'occupation', message: '職業は必須です' });
+  if (!data.occupation || data.occupation.trim() === "") {
+    errors.push({ field: "occupation", message: "職業は必須です" });
   }
 
-  if (!data.background || data.background.trim() === '') {
-    errors.push({ field: 'background', message: '背景は必須です' });
+  if (!data.background || data.background.trim() === "") {
+    errors.push({ field: "background", message: "背景は必須です" });
   }
 
   // 文字数制限の検証（ガス代節約のため）
@@ -200,7 +213,7 @@ export function validatePersonaForm(data: PersonaFormData): ValidationError[] {
 
   Object.entries(maxLengths).forEach(([field, maxLength]) => {
     const value = data[field as keyof PersonaFormData];
-    if (typeof value === 'string' && value.length > maxLength) {
+    if (typeof value === "string" && value.length > maxLength) {
       errors.push({
         field,
         message: `${field}は${maxLength}文字以内で入力してください`,
@@ -215,20 +228,21 @@ export function validatePersonaForm(data: PersonaFormData): ValidationError[] {
  * エラーメッセージを日本語化
  */
 export function translateContractError(error: any): string {
-  const message = error?.message || error?.reason || '不明なエラーが発生しました';
+  const message =
+    error?.message || error?.reason || "不明なエラーが発生しました";
 
   // よくあるエラーメッセージの翻訳
   const translations: Record<string, string> = {
-    'Name cannot be empty': '人格名を入力してください',
-    'Age must be between 1 and 199': '年齢は1〜199の範囲で入力してください',
-    'Not the owner of this persona': 'この人格の所有者ではありません',
-    'Persona is not active': '人格が無効化されています',
-    'Persona does not exist': '存在しない人格IDです',
-    'Cannot transfer to zero address': 'ゼロアドレスには移転できません',
-    'Cannot transfer to yourself': '自分自身には移転できません',
-    'User rejected the request': 'ユーザーがトランザクションを拒否しました',
-    'insufficient funds': '残高が不足しています',
-    'gas required exceeds allowance': 'ガス不足です',
+    "Name cannot be empty": "人格名を入力してください",
+    "Age must be between 1 and 199": "年齢は1〜199の範囲で入力してください",
+    "Not the owner of this persona": "この人格の所有者ではありません",
+    "Persona is not active": "人格が無効化されています",
+    "Persona does not exist": "存在しない人格IDです",
+    "Cannot transfer to zero address": "ゼロアドレスには移転できません",
+    "Cannot transfer to yourself": "自分自身には移転できません",
+    "User rejected the request": "ユーザーがトランザクションを拒否しました",
+    "insufficient funds": "残高が不足しています",
+    "gas required exceeds allowance": "ガス不足です",
   };
 
   // 部分マッチでの翻訳
@@ -246,13 +260,13 @@ export function translateContractError(error: any): string {
  */
 export function formatEventLog(eventName: string, args: any): string {
   switch (eventName) {
-    case 'PersonaCreated':
+    case "PersonaCreated":
       return `人格「${args.name}」が作成されました（ID: ${args.personaId}）`;
-    case 'PersonaUpdated':
+    case "PersonaUpdated":
       return `人格「${args.name}」が更新されました（ID: ${args.personaId}）`;
-    case 'PersonaTransferred':
+    case "PersonaTransferred":
       return `人格の所有権が移転されました（ID: ${args.personaId}）`;
-    case 'PersonaDeactivated':
+    case "PersonaDeactivated":
       return `人格が無効化されました（ID: ${args.personaId}）`;
     default:
       return `イベント: ${eventName}`;
