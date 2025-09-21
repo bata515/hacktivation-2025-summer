@@ -49,7 +49,7 @@ export async function chatWithPersona(
 
     // OpenAI APIに送信
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // コスト効率の良いモデルを使用
+      model: "gpt-5-mini", // コスト効率の良いモデルを使用
       messages:
         messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
       temperature: 0.7, // 創造性と一貫性のバランス
