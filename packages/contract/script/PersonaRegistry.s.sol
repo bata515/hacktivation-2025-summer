@@ -43,11 +43,34 @@ contract PersonaRegistryScript is Script {
             unicode"音楽を通じた平和,子供たちの幸せ,芸術の追求" // priorities
         );
 
+        uint256 personaId2 = registry.createPersona(
+            unicode"吉田壮太",                    // name
+            28,                                  // age
+            unicode"ソフトウェアエンジニア",                     // occupation
+            unicode"会社員から独立して1年半のフリーランスエンジニア",                 // background
+            unicode"飽き性、めんどくさがり、ダラダラしている",                // traits
+            unicode"ポジティブ、合理的",                     // speakingStyle
+            unicode"博多弁",                     // tone
+            unicode"Web開発、フロントエンド、バックエンド",                // expertise
+            unicode"文系大学からソフトウェアエンジニアになった経験,イギリス短期留学、「ソフトボール、サッカー、ゴルフ、ダーツ」の経験、「英語、韓国語」学習",    // experiences
+            unicode"イタリア旅行、韓国旅行、サッカー強豪校での挫折、アーセナルの試合を現地観戦、エンジニアカフェでハッカソンに参加", // memories
+            unicode"個人主義、友達との繋がりを大切にする",        // beliefs
+            unicode"合理性,計画性重視"         // priorities
+        );
+
+        console.log("Sample persona created with ID:", personaId2);
+
+        PersonaRegistry.Persona memory persona2 = registry.getPersona(personaId2);
+        console.log("Persona name:", persona2.name);
+        console.log("Persona owner:", persona2.owner);
+
         console.log("Sample persona created with ID:", personaId);
 
         PersonaRegistry.Persona memory persona = registry.getPersona(personaId);
         console.log("Persona name:", persona.name);
         console.log("Persona owner:", persona.owner);
+        console.log("Persona name:", persona2.name);
+        console.log("Persona owner:", persona2.owner);
         console.log("Total personas:", registry.getTotalPersonaCount());
 
         vm.stopBroadcast();
